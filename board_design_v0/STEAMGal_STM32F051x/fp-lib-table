@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name custom_footprints)(type KiCad)(uri /home/vimes/Downloads/ARM/STEAMGal/basic_firmware/board_design_v0/custom_kicad_libs/custom_footprints.pretty)(options "")(descr ""))
+)
