@@ -6,13 +6,15 @@
 int main(void) {
   // Define starting values for global variables.
   uled_state = 0;
-  buzzer_state = 0;
-  buzzer_tone = 15000;
-  buzzer_tone_hz = 15000;
-  buzzer_pulses = 500;
-  menu_state = TEST_MENU_LED_TOGGLE;
-  last_top_row = TEST_MENU_LED_TOGGLE;
-  draw_color = 0;
+  game_state = GAME_STATE_MAIN_MENU;
+  main_menu_state = MAIN_MENU_STATE_START;
+  uint8_t grid_x_i = 0;
+  uint8_t grid_y_i = 0;
+  for (grid_x_i = 0; grid_x_i < 10; ++grid_x_i) {
+    for (grid_y_i = 0; grid_y_i < 20; ++grid_y_i) {
+      tetris_grid[grid_x_i][grid_y_i] = TGRID_EMPTY;
+    }
+  }
 
   // Enable the GPIOA clock (buttons on pins A2-A7,
   // user LED on pin A12).
@@ -20,6 +22,8 @@ int main(void) {
   // Enable the GPIOB clock (I2C1 used on pins B6/B7,
   // buzzer on pin B0).
   RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+  // Enable the TIM2 clock.
+  RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
   // Enable the I2C1 clock.
   RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
   // Enable the SYSCFG clock for hardware interrupts.
@@ -177,32 +181,38 @@ int main(void) {
     NVIC_EnableIRQ(EXTI9_5_IRQn);
   #endif
 
+  // Enable the NVIC interrupt for TIM2.
+  // (Timer peripheral initialized and used elsewhere)
+  NVIC_SetPriority(TIM2_IRQn, 0x03);
+  NVIC_EnableIRQ(TIM2_IRQn);
+
   while (1) {
-    draw_test_menu();
+    // Draw the current frame based on the game's state.
+    if (game_state == GAME_STATE_MAIN_MENU) {
+      draw_main_menu();
+    }
+    else if (game_state == GAME_STATE_IN_GAME) {
+      draw_tetris_game();
+    }
+    else if (game_state == GAME_STATE_PAUSED) {
+      // (TODO)
+    }
+    else if (game_state == GAME_STATE_GAME_OVER) {
+      // (TODO)
+    }
+    else {
+      oled_draw_rect(0, 0, 128, 64, 0, 1);
+    }
+
     // Communicate the framebuffer to the OLED screen.
     i2c_display_framebuffer(I2C1_BASE, &oled_fb);
 
-    // Set the onboard LED.
+    // Set the onboard LED if the variable is set.
     if (uled_state) {
       GPIOA->ODR |=  (GPIO_ODR_12);
     }
     else {
       GPIOA->ODR &= ~(GPIO_ODR_12);
-    }
-
-    // Play a tone on the buzzer if applicable.
-    if (buzzer_state) {
-      // This probably is not actually an accurate conversion
-      // to Hertz. But it's a 48MHz clock so...
-      buzzer_tone = 48000000 / buzzer_tone_hz;
-      // Play for about 1/8-second. So:
-      // X pulses * Y cycles = 6000000
-      buzzer_pulses = 6000000 / buzzer_tone;
-      pulse_out_pin(&GPIOB->ODR,
-                    GPIO_ODR_0,
-                    buzzer_tone,
-                    buzzer_pulses);
-      buzzer_state = 0;
     }
   }
   return 0;

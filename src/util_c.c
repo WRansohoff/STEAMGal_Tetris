@@ -531,52 +531,48 @@ void oled_draw_text(int x, int y, char* cc, unsigned char color, char size) {
   }
 }
 
-/*
- * Firmware support methods.
- */
-void draw_test_menu() {
-  // Clear the screen.
+void draw_main_menu(void) {
   oled_draw_rect(0, 0, 128, 64, 0, 0);
-  // Draw an outline.
-  oled_draw_rect(0, 0, 128, 64, 4, 1);
-  // Draw a vertical and horizontal line to split the screen
-  // into 3 panes. (Use 'draw_rect' for 2-px width)
-  oled_draw_rect(63, 0, 2, 31, 0, 1);
-  oled_draw_rect(0, 31, 128, 2, 0, 1);
+  // Only use the middle 96 pixels, to make this easier
+  // to transition to a color display.
+  oled_draw_rect(15, 0, 96, 64, 2, 1);
+  // Draw a big 'TETRIS' in the top-middle.
+  oled_draw_text(27, 12, "TETRIS\0", 1, 'L');
+  // Draw menu options.
+  // (Currently just 'Start')
+  oled_draw_text(50, 40, "Start\0", 1, 'S');
+  // Draw a little triangle next to it.
+  oled_draw_v_line(40, 42, 5, 1);
+  oled_draw_v_line(41, 43, 3, 1);
+  oled_write_pixel(42, 44, 1);
+}
 
-  // Draw the four option panels. The currently-selected one
-  // should have its colors inverted; background 'on', text 'off'.
-  // 'Toggle LED' option.
-  if (menu_state == TEST_MENU_LED_TOGGLE) {
-    draw_color = 1;
-    oled_draw_rect(0, 0, 63, 31, 0, draw_color);
+void draw_tetris_game(void) {
+  oled_draw_rect(0, 0, 128, 64, 0, 0);
+  // Only use the middle 96 pixels, to make this easier
+  // to transition to a color display.
+  oled_draw_rect(15, 0, 96, 64, 2, 1);
+  // Draw a test grid, 10x20 @3 square pixels.
+  uint8_t grid_ix = 0;
+  uint8_t grid_iy = 0;
+  // Vertical 'column' lines.
+  for (grid_ix = 0; grid_ix < 11; ++grid_ix) {
+    oled_draw_v_line(47 + (grid_ix * 3), 2, 60, 1);
   }
-  else { draw_color = 0; }
-  snprintf(oled_line_buf, 23, "%s", "Toggle\0");
-  oled_draw_text(13, 8, oled_line_buf, !draw_color, 'S');
-  snprintf(oled_line_buf, 23, "%s", "LED\0");
-  oled_draw_text(22, 18, oled_line_buf, !draw_color, 'S');
-  // 'Sound Buzzer' option.
-  if (menu_state == TEST_MENU_SOUND_BUZZER) {
-    draw_color = 1;
-    oled_draw_rect(63, 0, 63, 31, 0, draw_color);
+  // Horizontal 'row' lines.
+  for (grid_iy = 0; grid_iy < 21; ++grid_iy) {
+    oled_draw_h_line(48, 2 + (grid_iy * 3), 30, 1);
   }
-  else { draw_color = 0; }
-  snprintf(oled_line_buf, 23, "%s", "Test\0");
-  oled_draw_text(83, 8, oled_line_buf, !draw_color, 'S');
-  snprintf(oled_line_buf, 23, "%s", "Buzzer\0");
-  oled_draw_text(77, 18, oled_line_buf, !draw_color, 'S');
-  // 'Set Buzzer Tone' option.
-  if (menu_state == TEST_MENU_BUZZER_TONE) {
-    draw_color = 1;
-    oled_draw_rect(3, 31, 122, 31, 0, draw_color);
+
+  // Draw the grid.
+  for (grid_ix = 0; grid_ix < 10; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 20; ++grid_iy) {
+      // For monochrome displays, just check empty/not empty.
+      if (tetris_grid[grid_ix][grid_iy]) {
+        oled_draw_rect(48 + (grid_ix * 3),
+                       3 + (grid_iy * 3),
+                       2, 2, 0, 1);
+      }
+    }
   }
-  else { draw_color = 0; }
-  snprintf(oled_line_buf, 23, "%s", "Buzzer Tone:\0");
-  oled_draw_text(28, 36, oled_line_buf, !draw_color, 'S');
-  oled_draw_letter_c(44, 46, '<', !draw_color, 'S');
-  oled_draw_letter_i(52, 46, buzzer_tone_hz, !draw_color, 'S');
-  oled_draw_letter_c(88, 46, '>', !draw_color, 'S');
-  snprintf(oled_line_buf, 23, "%s", "Cyc\0");
-  oled_draw_text(100, 46, oled_line_buf, !draw_color, 'S');
 }

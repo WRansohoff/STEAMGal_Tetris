@@ -18,7 +18,8 @@ void oled_draw_letter_c(int x, int y, char c, unsigned char color, char size);
 void oled_draw_letter_i(int x, int y, int ic, unsigned char color, char size);
 void oled_draw_text(int x, int y, char* cc, unsigned char color, char size);
 
-// Firmware support methods.
-void draw_test_menu();
+// Tetris methods!
+void draw_main_menu(void);
+void draw_tetris_game(void);
 
 #endif

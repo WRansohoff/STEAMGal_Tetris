@@ -12,92 +12,96 @@
  */
 // Common definitions for each line, independent of
 // available NVIC interrupts on any specific chip.
-void EXTI0_line_interrupt(void) {
+inline void EXTI0_line_interrupt(void) {
 }
 
-void EXTI1_line_interrupt(void) {
+inline void EXTI1_line_interrupt(void) {
 }
 
-void EXTI2_line_interrupt(void) {
+inline void EXTI2_line_interrupt(void) {
   // 'Left' button.
-  if (menu_state == TEST_MENU_SOUND_BUZZER) {
-    menu_state = TEST_MENU_LED_TOGGLE;
-  }
-  else if (menu_state == TEST_MENU_BUZZER_TONE) {
-    buzzer_tone_hz -= 500;
-    if (buzzer_tone_hz <= 0) {
-      buzzer_tone_hz = 500;
-    }
-  }
 }
 
-void EXTI3_line_interrupt(void) {
+inline void EXTI3_line_interrupt(void) {
   // 'Up' button.
-  if (menu_state == TEST_MENU_BUZZER_TONE) {
-    menu_state = last_top_row;
-  }
 }
 
-void EXTI4_line_interrupt(void) {
+inline void EXTI4_line_interrupt(void) {
   // 'Down' button.
-  if (menu_state == TEST_MENU_LED_TOGGLE ||
-      menu_state == TEST_MENU_SOUND_BUZZER) {
-    last_top_row = menu_state;
-    menu_state = TEST_MENU_BUZZER_TONE;
+}
+
+inline void EXTI5_line_interrupt(void) {
+  // 'Right' button.
+}
+
+inline void EXTI6_line_interrupt(void) {
+  // 'B' button.
+  if (game_state == GAME_STATE_MAIN_MENU) {
+  }
+  else if (game_state == GAME_STATE_IN_GAME) {
+    // For now, B goes back to the main menu for debugging.
+    game_state = GAME_STATE_MAIN_MENU;
+    main_menu_state = MAIN_MENU_STATE_START;
+    uled_state = 0;
+    stop_timer(TIM2);
+  }
+  else if (game_state == GAME_STATE_PAUSED) {
+  }
+  else if (game_state == GAME_STATE_GAME_OVER) {
   }
 }
 
-void EXTI5_line_interrupt(void) {
-  // 'Right' button.
-  if (menu_state == TEST_MENU_LED_TOGGLE) {
-    menu_state = TEST_MENU_SOUND_BUZZER;
-  }
-  else if (menu_state == TEST_MENU_BUZZER_TONE) {
-    buzzer_tone_hz += 500;
-    if (buzzer_tone_hz >= 25000) {
-      buzzer_tone_hz = 25000;
+inline void EXTI7_line_interrupt(void) {
+  // 'A' button.
+  if (game_state == GAME_STATE_MAIN_MENU) {
+    if (main_menu_state == MAIN_MENU_STATE_START) {
+      // Start a new game!
+      game_state = GAME_STATE_IN_GAME;
+      uled_state = 0;
+      // To test the timer, use a prescaler of 1024.
+      // 48MHz/1024 ~= 46.875KHz.
+      // Use 46,875 'ticks' at 46.875KHz to trigger ~every second.
+      start_timer(TIM2, 1024, 46875);
     }
   }
-}
-
-void EXTI6_line_interrupt(void) {
-  // 'B' button.
-  // Currently, do nothing.
-}
-
-void EXTI7_line_interrupt(void) {
-  // 'A' button.
-  // Action depends on menu state.
-  if (menu_state == TEST_MENU_LED_TOGGLE) {
-    uled_state = !uled_state;
+  else if (game_state == GAME_STATE_IN_GAME) {
   }
-  else if (menu_state == TEST_MENU_SOUND_BUZZER) {
-    buzzer_state = 1;
+  else if (game_state == GAME_STATE_PAUSED) {
+  }
+  else if (game_state == GAME_STATE_GAME_OVER) {
   }
 }
 
-void EXTI8_line_interrupt(void) {
+inline void EXTI8_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI9_line_interrupt(void) {
+inline void EXTI9_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI10_line_interrupt(void) {
+inline void EXTI10_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI11_line_interrupt(void) {
+inline void EXTI11_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI12_line_interrupt(void) {
+inline void EXTI12_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI13_line_interrupt(void) {
+inline void EXTI13_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI14_line_interrupt(void) {
+inline void EXTI14_line_interrupt(void) {
+  // (Unused)
 }
 
-void EXTI15_line_interrupt(void) {
+inline void EXTI15_line_interrupt(void) {
+  // (Unused)
 }
 
 #ifdef VVC_F0
@@ -231,3 +235,12 @@ return;
 }
 
 #endif
+
+// Interrupts common to all supported chips.
+void TIM2_IRQ_handler(void) {
+  // Handle a timer 'update' interrupt event
+  if (TIM2->SR & TIM_SR_UIF) {
+    TIM2->SR &= ~(TIM_SR_UIF);
+    uled_state = !uled_state;
+  }
+}

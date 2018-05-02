@@ -24,15 +24,29 @@ extern void pulse_out_pin(volatile void* gpiox_odr,
                           unsigned int num_pulses);
 
 // ----------------------
-// Global variables.
+// Global variables and defines.
 volatile unsigned char uled_state;
-volatile unsigned char buzzer_state;
-volatile unsigned int  buzzer_tone;
-volatile unsigned int  buzzer_tone_hz;
-volatile unsigned int  buzzer_pulses;
-volatile int menu_state;
-volatile int last_top_row;
-volatile unsigned char draw_color;
+#define GAME_STATE_MAIN_MENU (0)
+#define GAME_STATE_IN_GAME   (1)
+#define GAME_STATE_PAUSED    (2)
+#define GAME_STATE_GAME_OVER (3)
+volatile uint8_t game_state;
+#define MAIN_MENU_STATE_START (0)
+volatile uint8_t main_menu_state;
+
+// The Tetris grid; use a full byte per pixel. It's a
+// bit profligate, but we'll want to store color
+// in the V2 board and it'll make the math simple.
+#define TGRID_EMPTY   (0)
+#define TGRID_CURRENT (1)
+#define TGRID_I       (2)
+#define TGRID_O       (3)
+#define TGRID_L       (4)
+#define TGRID_J       (5)
+#define TGRID_T       (6)
+#define TGRID_Z       (7)
+#define TGRID_S       (8)
+volatile unsigned char tetris_grid[10][20];
 
 // Buffer for the OLED screen.
 // Currently only supports 128x64-px monochrome.
@@ -43,12 +57,6 @@ volatile unsigned char oled_fb[OLED_FB_SIZE];
 char oled_line_buf[24];
 
 // Global defines.
-// Define some menu states.
-// This is a simple test menu to allow testing the basic
-// board functionality.
-#define TEST_MENU_LED_TOGGLE   0
-#define TEST_MENU_SOUND_BUZZER 1
-#define TEST_MENU_BUZZER_TONE  2
 // Define a simple monospace font; each character is 6x8 pixels,
 // which comes out to 6 bytes or 3 words for every 2 characters.
 #define OLED_CH_A0       0x1F688868

@@ -71,6 +71,7 @@ AS_SRC   += ./src/util.S
 C_SRC    =  ./src/main.c
 C_SRC    += ./src/util_c.c
 C_SRC    += ./src/interrupts_c.c
+C_SRC    += ./src/peripherals.c
 
 INCLUDE  =  -I./
 INCLUDE  += -I./src

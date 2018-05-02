@@ -4,5 +4,6 @@
 #include "global.h"
 #include "util_c.h"
 #include "interrupts_c.h"
+#include "peripherals.h"
 
 #endif
