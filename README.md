@@ -6,9 +6,9 @@ This is firmware for a 'tetris' game on a 'STEAMGal' board driven by an STM32 ch
 
 Nothing functional. The firmware simply initializes the system clock to 48MHz driven by the HSI oscillator, then draws a test menu to the OLED screen.
 
-It sets up hardware interrupts for each of the 6 buttons - the 'B' button does nothing, the 'A' button selects a menu option, and the four arrow buttons move around the 3 menu panels. When the bottom 'buzzer tone' panel is selected, the left/right buttons change the tone of the buzzer sound which is made by the 'Buzzer Test' option.
+It does set up hardware interrupts for each of the 6 buttons - the 'A' button selects the test menu's start menu to 'start the game', and the 'B' button returns to the menu.
 
-It's simple, but at least it verifies that everything works.
+But the game isn't a game yet; a grid is drawn to the screen, and the on-board LED blinks to represent the timing of a game 'step', as a test of the STM32 timer peripheral and interrupt.
 
 Currently, only the STM32F051K8 is supported, but I hope to add the STM32F303K8 as well if time permits.
 
