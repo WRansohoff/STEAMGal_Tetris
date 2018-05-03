@@ -2,8 +2,12 @@
 #define _VVC_UTIL_C_H
 
 #include "global.h"
+#include "peripherals.h"
 
 // C-languages utility method signatures.
+
+// Methods for interacting with specific I2C devices.
+void ssd1306_start_sequence(I2C_TypeDef *I2Cx);
 
 // Methods for writing to the 1KB OLED framebuffer.
 // These don't actually write through to the screen until

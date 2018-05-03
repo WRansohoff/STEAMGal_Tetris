@@ -110,11 +110,17 @@ int main(void) {
    * (The screen's address is 0x78)
    */
 
-  // Initialize the I2C peripheral and connected devices.
-  // (1MHz @ 48MHz PLL)
-  i2c_periph_init(I2C1_BASE, 0x50100103);
+  /* Initialize the I2C peripheral and connected devices.
+   * (1MHz @ 48MHz PLL)
+   *       At 48MHz, here are some common values:
+   *         - 0x50100103: 1MHz   'fast mode+'
+   *         - 0x50330309: 400KHz 'fast mode'
+   *         - 0xB0420F13: 100KHz
+   */
+  i2c_initialize(I2C1, 0x50100103);
+  i2c_set_addr(I2C1, 0x78);
   // Initialize the SSD1306 OLED display.
-  i2c_init_ssd1306(I2C1_BASE);
+  ssd1306_start_sequence(I2C1);
 
   // Setup hardware interrupts on the EXTI lines associated
   // with the 6 button inputs.
@@ -205,7 +211,7 @@ int main(void) {
     }
 
     // Communicate the framebuffer to the OLED screen.
-    i2c_display_framebuffer(I2C1_BASE, &oled_fb);
+    i2c_stream_framebuffer(I2C1);
 
     // Set the onboard LED if the variable is set.
     if (uled_state) {

@@ -1,6 +1,50 @@
 #include "util_c.h"
 
 // C-language utility method definitions.
+/*
+ * Send a series of startup commands over I2C.
+ */
+void ssd1306_start_sequence(I2C_TypeDef *I2Cx) {
+  // Display clock division
+  i2c_write_command(I2Cx, 0xD5);
+  i2c_write_command(I2Cx, 0x80);
+  // Set multiplex
+  i2c_write_command(I2Cx, 0xA8);
+  i2c_write_command(I2Cx, 0x3F);
+  // Set display offset ('start column')
+  i2c_write_command(I2Cx, 0xD3);
+  i2c_write_command(I2Cx, 0x00);
+  // Set start line (0b01000000 | line)
+  i2c_write_command(I2Cx, 0x40);
+  // Set internal charge pump (on)
+  i2c_write_command(I2Cx, 0x8D);
+  i2c_write_command(I2Cx, 0x14);
+  // Set memory mode
+  i2c_write_command(I2Cx, 0x20);
+  i2c_write_command(I2Cx, 0x00);
+  // Set 'SEGREMAP'
+  i2c_write_command(I2Cx, 0xA1);
+  // Set column scan (descending)
+  i2c_write_command(I2Cx, 0xC8);
+  // Set 'COMPINS'
+  i2c_write_command(I2Cx, 0xDA);
+  i2c_write_command(I2Cx, 0x12);
+  // Set contrast
+  i2c_write_command(I2Cx, 0x81);
+  i2c_write_command(I2Cx, 0xCF);
+  // Set precharge
+  i2c_write_command(I2Cx, 0xD9);
+  i2c_write_command(I2Cx, 0xF1);
+  // Set VCOM detect
+  i2c_write_command(I2Cx, 0xDB);
+  i2c_write_command(I2Cx, 0x40);
+  // Set output to follow RAM content
+  i2c_write_command(I2Cx, 0xA4);
+  // Normal display mode
+  i2c_write_command(I2Cx, 0xA6);
+  // Display on
+  i2c_write_command(I2Cx, 0xAF);
+}
 
 /*
  * Draw a horizontal line.
