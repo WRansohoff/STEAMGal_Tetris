@@ -34,19 +34,50 @@ volatile uint8_t game_state;
 #define MAIN_MENU_STATE_START (0)
 volatile uint8_t main_menu_state;
 
+// Macro definitions for the Tetris grid/bricks.
+// (Note: The brick values should not be changed; the
+//  'BRICKS' const array relies on them. [TODO])
+#define TGRID_I       (0)
+#define TGRID_O       (1)
+#define TGRID_L       (2)
+#define TGRID_J       (3)
+#define TGRID_T       (4)
+#define TGRID_Z       (5)
+#define TGRID_S       (6)
+#define TGRID_EMPTY   (7)
+#define TGRID_CURRENT (8)
+#define TBRICK_I      TGRID_I
+#define TBRICK_O      TGRID_O
+#define TBRICK_L      TGRID_L
+#define TBRICK_J      TGRID_J
+#define TBRICK_T      TGRID_T
+#define TBRICK_Z      TGRID_Z
+#define TBRICK_S      TGRID_S
+// Define X/Y boundaries for each brick. Based on a 4x4 grid,
+// with the 'center of rotation' at (1,1).
+// Indices: [ rotation ], [ brick type ].
+// The uint16 value has the 4x4 grid, with each hex digit
+// representing a row. Most-Significant Bit = top rows.
+// (Try drawing them out - it helps.)
+static const uint16_t BRICKS[4][7] = {
+  // Ordering is 'I', 'O', 'L', 'J', 'T', 'Z', 'S'.
+  // 'Rotated by 0   degrees'
+  { 0x4444, 0x0660, 0xC440, 0x6440, 0x4E00, 0x4C80, 0x8C40 },
+  // 'Rotated by 90  degrees'
+  { 0x0F00, 0x0660, 0x2E00, 0x0E20, 0x4640, 0xC600, 0x6C00 },
+  // 'Rotated by 180 degrees'
+  { 0x2222, 0x0660, 0x4460, 0x44C0, 0x0E40, 0x2640, 0x4620 },
+  // 'Rotated by 270 degrees'
+  { 0x00F0, 0x0660, 0x0E80, 0x8E00, 0x4C40, 0x0C60, 0x06C0 }
+};
 // The Tetris grid; use a full byte per pixel. It's a
 // bit profligate, but we'll want to store color
 // in the V2 board and it'll make the math simple.
-#define TGRID_EMPTY   (0)
-#define TGRID_CURRENT (1)
-#define TGRID_I       (2)
-#define TGRID_O       (3)
-#define TGRID_L       (4)
-#define TGRID_J       (5)
-#define TGRID_T       (6)
-#define TGRID_Z       (7)
-#define TGRID_S       (8)
 volatile unsigned char tetris_grid[10][20];
+// Store information about the current block.
+volatile unsigned char cur_block_type;
+volatile uint8_t cur_block_x;
+volatile uint8_t cur_block_y;
 
 // Buffer for the OLED screen.
 // Currently only supports 128x64-px monochrome.

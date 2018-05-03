@@ -8,6 +8,10 @@ int main(void) {
   uled_state = 0;
   game_state = GAME_STATE_MAIN_MENU;
   main_menu_state = MAIN_MENU_STATE_START;
+  cur_block_type = TBRICK_I;
+  cur_block_x = 0;
+  cur_block_y = 0;
+  // Empty the tetris grid, to start.
   uint8_t grid_x_i = 0;
   uint8_t grid_y_i = 0;
   for (grid_x_i = 0; grid_x_i < 10; ++grid_x_i) {

@@ -50,7 +50,8 @@ void ssd1306_start_sequence(I2C_TypeDef *I2Cx) {
  * Draw a horizontal line.
  * First, calculate the Y bitmask and byte offset, then just go from x->x.
  */
-void oled_draw_h_line(int x, int y, int w, unsigned char color) {
+inline void oled_draw_h_line(int x, int y,
+                             int w, unsigned char color) {
   int y_page_offset = y / 8;
   y_page_offset *= 128;
   int bit_to_set = 0x01 << (y & 0x07);
@@ -71,7 +72,8 @@ void oled_draw_h_line(int x, int y, int w, unsigned char color) {
 /*
  * Draw a veritcal line.
  */
-void oled_draw_v_line(int x, int y, int h, unsigned char color) {
+inline void oled_draw_v_line(int x, int y,
+                             int h, unsigned char color) {
   int y_page_offset;
   int bit_to_set;
   int y_pos;
@@ -98,8 +100,8 @@ void oled_draw_v_line(int x, int y, int h, unsigned char color) {
  *        If >0, draw an outline inside the dimensions of N pixels.
  *   - color: If 0, clear drawn bits. If not 0, set drawn bits.
  */
-void oled_draw_rect(int x, int y, int w, int h,
-          int outline, unsigned char color) {
+inline void oled_draw_rect(int x, int y, int w, int h,
+                           int outline, unsigned char color) {
   if (outline > 0) {
     // Draw an outline.
     int o_pos;
@@ -149,7 +151,7 @@ void oled_draw_rect(int x, int y, int w, int h,
  *   Bit offset  = (y & 0x07)
  * 'color' indicates whether to set or unset the pixel. 0 means 'unset.'
  */
-void oled_write_pixel(int x, int y, unsigned char color) {
+inline void oled_write_pixel(int x, int y, unsigned char color) {
   int y_page = y / 8;
   int byte_to_mod = x + (y_page * 128);
   int bit_to_set = 0x01 << (y & 0x07);
@@ -618,5 +620,24 @@ void draw_tetris_game(void) {
                        2, 2, 0, 1);
       }
     }
+  }
+}
+
+/*
+ * Main 'tick' for the Tetris game loop.
+ * This performs one 'step' in the game, either dropping a brick
+ * or setting it in place and clearing rows/creating the next one.
+ */
+void tetris_game_tick(void) {
+  unsigned char can_drop = 0;
+  /* Step 1:  Try to drop the current brick by 1 cell. */
+  if (can_drop) {
+    /* Step 2a: If the current brick can drop, do so. */
+    /* Step 3a: Update the main Tetris grid. */
+  }
+  else {
+    /* Step 2b: If the current brick cannot drop, fix it
+     *          in the main Tetris grid. */
+    /* Step 3b: Create a new 'current brick'. */
   }
 }

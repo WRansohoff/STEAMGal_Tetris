@@ -25,5 +25,6 @@ void oled_draw_text(int x, int y, char* cc, unsigned char color, char size);
 // Tetris methods!
 void draw_main_menu(void);
 void draw_tetris_game(void);
+void tetris_game_tick(void);
 
 #endif
