@@ -59,8 +59,8 @@ inline void EXTI6_line_interrupt(void) {
   }
   else if (game_state == GAME_STATE_IN_GAME) {
     // Rotate the brick clockwise, if able.
-    if (!check_brick_rot((cur_block_r + 1) % 4)) {
-      cur_block_r = (cur_block_r + 1) % 4;
+    if (!check_brick_rot((cur_block_r - 1) % 4)) {
+      cur_block_r = (cur_block_r - 1) % 4;
     }
   }
   else if (game_state == GAME_STATE_PAUSED) {
@@ -83,18 +83,23 @@ inline void EXTI7_line_interrupt(void) {
       // Start a new game!
       game_state = GAME_STATE_IN_GAME;
       uled_state = 0;
-      // To test the timer, use a prescaler of 1024.
+      // Set a PRNG-based first block type.
+      uint8_t new_block_type = TIM3->CNT & 0x7;
+      // (Valid block types are between [0:6])
+      while (new_block_type == 7) { new_block_type = TIM3->CNT & 0x7; }
+      cur_block_type = new_block_type;
+      // For a basic timer, use a prescaler of 1024.
       // 48MHz/1024 ~= 46.875KHz.
       // Use 46,875 'ticks' at 46.875KHz to trigger ~every second.
-      //start_timer(TIM2, 1024, 46875);
+      //start_timer(TIM2, 1024, 46875, 1);
       // Or go a bit faster, for debugging.
-      start_timer(TIM2, 1024, 10000);
+      start_timer(TIM2, 1024, 10000, 1);
     }
   }
   else if (game_state == GAME_STATE_IN_GAME) {
     // Rotate the brick counter-clockwise, if able.
-    if (!check_brick_rot((cur_block_r - 1) % 4)) {
-      cur_block_r = (cur_block_r - 1) % 4;
+    if (!check_brick_rot((cur_block_r + 1) % 4)) {
+      cur_block_r = (cur_block_r + 1) % 4;
     }
   }
   else if (game_state == GAME_STATE_PAUSED) {
@@ -283,5 +288,11 @@ void TIM2_IRQ_handler(void) {
     if (game_state == GAME_STATE_IN_GAME) {
       tetris_game_tick();
     }
+  }
+}
+
+void TIM14_IRQ_handler(void) {
+  if (TIM14->SR & TIM_SR_UIF) {
+    TIM14->SR &= ~(TIM_SR_UIF);
   }
 }

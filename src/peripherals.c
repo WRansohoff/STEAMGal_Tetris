@@ -11,14 +11,19 @@
  */
 void start_timer(TIM_TypeDef *TIMx,
                  uint16_t prescaler,
-                 uint16_t period) {
-  // Initialize the 'TIM2' timer peripheral. (TODO: F303 support)
+                 uint16_t period,
+                 uint8_t  with_interrupt) {
+  // Initialize the 'TIMx' timer peripheral. (TODO: F303 support)
   // Start by making sure the timer's 'counter' is off.
   TIMx->CR1 &= ~(TIM_CR1_CEN);
   // Next, reset the peripheral. (This is where a HAL can help)
   if (TIMx == TIM2) {
     RCC->APB1RSTR |=  (RCC_APB1RSTR_TIM2RST);
     RCC->APB1RSTR &= ~(RCC_APB1RSTR_TIM2RST);
+  }
+  else if (TIMx == TIM3) {
+    RCC->APB1RSTR |=  (RCC_APB1RSTR_TIM3RST);
+    RCC->APB1RSTR &= ~(RCC_APB1RSTR_TIM3RST);
   }
   // Set clock division to 1; the timer triggers every N events.
   // Also set the counter to count up.
@@ -33,10 +38,12 @@ void start_timer(TIM_TypeDef *TIMx,
   // Before enabling the counter, trigger an 'update' event to
   // make sure that the chip registers the 'prescaler' settings.
   TIMx->EGR  |=  (TIM_EGR_UG);
-  // Enable the 'update' timer event/interrupt.
-  TIMx->DIER |=  (TIM_DIER_UIE);
+  if (with_interrupt) {
+    // Enable the 'update' timer event/interrupt.
+    TIMx->DIER |=  (TIM_DIER_UIE);
+  }
   // Finally, enable the timer.
-  TIM2->CR1  |=  (TIM_CR1_CEN);
+  TIMx->CR1  |=  (TIM_CR1_CEN);
 }
 
 /*
@@ -44,9 +51,9 @@ void start_timer(TIM_TypeDef *TIMx,
  */
 void stop_timer(TIM_TypeDef *TIMx) {
   // Turn off the timer's 'counter'.
-  TIM2->CR1 &= ~(TIM_CR1_CEN);
+  TIMx->CR1 &= ~(TIM_CR1_CEN);
   // Clear the 'pending update interrupt' flag.
-  TIM2->SR  &= ~(TIM_SR_UIF);
+  TIMx->SR  &= ~(TIM_SR_UIF);
 }
 
 /*

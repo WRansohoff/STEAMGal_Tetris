@@ -75,7 +75,7 @@ static const uint16_t BRICKS[4][7] = {
 // in the V2 board and it'll make the math simple.
 volatile unsigned char tetris_grid[10][20];
 // Store information about the current block.
-volatile unsigned char cur_block_type;
+volatile uint8_t cur_block_type;
 volatile int8_t cur_block_x;
 volatile int8_t cur_block_y;
 volatile int8_t cur_block_r;

@@ -29,10 +29,16 @@ int main(void) {
   RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
   // Enable the TIM2 clock.
   RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+  // Enable the TIM14 clock.
+  RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
   // Enable the I2C1 clock.
   RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
   // Enable the SYSCFG clock for hardware interrupts.
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+  // Start the TIM14 clock to count rapidly.
+  // This will be a rudimentary PRNG.
+  start_timer(TIM3, 0, 0xFFFF, 0);
 
   // Setup GPIO pins A2, A3, A4, A5, A6, and A7 as inputs
   // with pullups, low-speed.

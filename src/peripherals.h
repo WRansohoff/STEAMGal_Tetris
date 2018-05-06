@@ -7,7 +7,8 @@
 void stop_timer(TIM_TypeDef *TIMx);
 void start_timer(TIM_TypeDef *TIMx,
                  uint16_t prescaler,
-                 uint16_t period);
+                 uint16_t period,
+                 uint8_t  with_interrupt);
 
 /* I2C Peripheral */
 void i2c_initialize(I2C_TypeDef *I2Cx,

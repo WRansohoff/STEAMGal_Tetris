@@ -745,6 +745,10 @@ void tetris_game_tick(void) {
     }
     /* Step 3b: Clear any appropriate rows. */
     /* Step 4b: Create a new 'current brick'. */
+    uint8_t new_block_type = TIM3->CNT & 0x7;
+    // (Valid block types are between [0:6])
+    while (new_block_type == 7) { new_block_type = TIM3->CNT & 0x7; }
+    cur_block_type = new_block_type;
     cur_block_x = 4;
     cur_block_y = -1;
     cur_block_r = 0;
