@@ -78,7 +78,7 @@ volatile unsigned char tetris_grid[10][20];
 volatile unsigned char cur_block_type;
 volatile int8_t cur_block_x;
 volatile int8_t cur_block_y;
-volatile uint8_t cur_block_r;
+volatile int8_t cur_block_r;
 
 // Buffer for the OLED screen.
 // Currently only supports 128x64-px monochrome.

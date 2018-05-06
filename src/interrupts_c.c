@@ -30,6 +30,13 @@ inline void EXTI2_line_interrupt(void) {
 
 inline void EXTI3_line_interrupt(void) {
   // 'Up' button.
+  if (game_state == GAME_STATE_IN_GAME) {
+    // For now, 'Up' goes back to the main menu for debugging.
+    game_state = GAME_STATE_MAIN_MENU;
+    main_menu_state = MAIN_MENU_STATE_START;
+    uled_state = 0;
+    stop_timer(TIM2);
+  }
 }
 
 inline void EXTI4_line_interrupt(void) {
@@ -51,11 +58,10 @@ inline void EXTI6_line_interrupt(void) {
   if (game_state == GAME_STATE_MAIN_MENU) {
   }
   else if (game_state == GAME_STATE_IN_GAME) {
-    // For now, B goes back to the main menu for debugging.
-    game_state = GAME_STATE_MAIN_MENU;
-    main_menu_state = MAIN_MENU_STATE_START;
-    uled_state = 0;
-    stop_timer(TIM2);
+    // Rotate the brick clockwise, if able.
+    if (!check_brick_rot((cur_block_r + 1) % 4)) {
+      cur_block_r = (cur_block_r + 1) % 4;
+    }
   }
   else if (game_state == GAME_STATE_PAUSED) {
   }
@@ -86,6 +92,10 @@ inline void EXTI7_line_interrupt(void) {
     }
   }
   else if (game_state == GAME_STATE_IN_GAME) {
+    // Rotate the brick counter-clockwise, if able.
+    if (!check_brick_rot((cur_block_r - 1) % 4)) {
+      cur_block_r = (cur_block_r - 1) % 4;
+    }
   }
   else if (game_state == GAME_STATE_PAUSED) {
   }

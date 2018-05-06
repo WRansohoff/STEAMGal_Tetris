@@ -664,6 +664,28 @@ void reset_game_state(void) {
 }
 
 /*
+ * Check whether the current brick can rotate into a given
+ * position. Return 1 if there is a collision, 0 if it can rotate.
+ */
+uint8_t check_brick_rot(int8_t new_r) {
+  uint8_t grid_ix = 0;
+  uint8_t grid_iy = 0;
+  for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
+      if ((cur_block_y+grid_iy >= 0) &&
+          (BRICKS[new_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) &&
+          ((cur_block_y+grid_iy > 19) ||
+           (cur_block_x+grid_ix < 0) ||
+           (cur_block_x+grid_ix > 9) ||
+           (tetris_grid[cur_block_x+grid_ix][cur_block_y+grid_iy] != TGRID_EMPTY))) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+/*
  * Check whether the current brick can move into a
  * given grid coordinate.
  * Return 1 if there is a collision, 0 if the space is free.
