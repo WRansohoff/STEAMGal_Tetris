@@ -4,11 +4,11 @@ This is firmware for a 'tetris' game on a 'STEAMGal' board driven by an STM32 ch
 
 # Current Status
 
-Nothing functional. The firmware simply initializes the system clock to 48MHz driven by the HSI oscillator, then draws a test menu to the OLED screen.
+Incomplete. The firmware initializes the system clock to 48MHz driven by the HSI oscillator, then draws a simple menu to the OLED screen.
 
-It does set up hardware interrupts for each of the 6 buttons - the 'A' button selects the test menu's start menu to 'start the game', and the 'B' button returns to the menu.
+It sets up hardware interrupts for each of the 6 buttons - the 'A' button selects the test menu's start menu to 'start the game', and the 'B' button returns to the menu.
 
-But the game isn't a game yet; a grid is drawn to the screen, and the on-board LED blinks to represent the timing of a game 'step', as a test of the STM32 timer peripheral and interrupt.
+The onboard LED blinks on and off each game 'tick', but currently it's not really a 'Tetris' game. The bricks can move around and stack, and a game over can be detected. But that's about it.
 
 Currently, only the STM32F051K8 is supported, but I hope to add the STM32F303K8 as well if time permits.
 
