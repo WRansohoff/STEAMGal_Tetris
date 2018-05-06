@@ -29,6 +29,7 @@ void draw_tetris_game(void);
 void reset_game_state(void);
 uint8_t check_brick_rot(int8_t new_r);
 uint8_t check_brick_pos(int8_t xp, int8_t yp);
+void tetris_clear_row(uint8_t row_num);
 void tetris_game_tick(void);
 
 #endif

@@ -708,13 +708,32 @@ uint8_t check_brick_pos(int8_t xp, int8_t yp) {
 }
 
 /*
+ * Clear a row in the tetris grid, and shift the rows above down.
+ */
+void tetris_clear_row(uint8_t row_num) {
+  uint8_t grid_ix;
+  uint8_t grid_iy;
+  // For each row (starting at the row to clear,)
+  // replace it with the row above and move up 1.
+  for (grid_iy = row_num; grid_iy > 0; --grid_iy) {
+    for (grid_ix = 0; grid_ix < 9; ++grid_ix) {
+      tetris_grid[grid_ix][grid_iy] = tetris_grid[grid_ix][grid_iy-1];
+    }
+  }
+  // For row 0, just set all cells to empty.
+  for (grid_ix = 0; grid_ix < 9; ++grid_ix) {
+    tetris_grid[grid_ix][0] = TGRID_EMPTY;
+  }
+}
+
+/*
  * Main 'tick' for the Tetris game loop.
  * This performs one 'step' in the game, either dropping a brick
  * or setting it in place and clearing rows/creating the next one.
  */
 void tetris_game_tick(void) {
-  uint8_t grid_ix = 0;
-  uint8_t grid_iy = 0;
+  int8_t grid_ix = 0;
+  int8_t grid_iy = 0;
   unsigned char can_drop = 1;
   /* Step 1:  Try to drop the current brick by 1 cell. */
   if (check_brick_pos(cur_block_x, cur_block_y+1)) {
@@ -743,7 +762,28 @@ void tetris_game_tick(void) {
         }
       }
     }
+
     /* Step 3b: Clear any appropriate rows. */
+    grid_iy = 19;
+    uint8_t row_has_space = 0;
+    while (grid_iy >= 0) {
+      row_has_space = 0;
+      // If the row is full, clear it and move all the
+      // rows above it down by one.
+      for (grid_ix = 0; grid_ix < 10; ++grid_ix) {
+        if (tetris_grid[grid_ix][grid_iy] == TGRID_EMPTY) {
+          row_has_space = 1;
+        }
+      }
+      if (!row_has_space) {
+        tetris_clear_row(grid_iy);
+      }
+      // If not, move to the next row.
+      else {
+        grid_iy--;
+      }
+    }
+
     /* Step 4b: Create a new 'current brick'. */
     uint8_t new_block_type = TIM3->CNT & 0x7;
     // (Valid block types are between [0:6])
