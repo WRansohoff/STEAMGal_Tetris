@@ -614,9 +614,21 @@ void draw_tetris_game(void) {
   for (grid_ix = 0; grid_ix < 10; ++grid_ix) {
     for (grid_iy = 0; grid_iy < 20; ++grid_iy) {
       // For monochrome displays, just check empty/not empty.
-      if (tetris_grid[grid_ix][grid_iy]) {
+      if (tetris_grid[grid_ix][grid_iy] != TGRID_EMPTY) {
         oled_draw_rect(48 + (grid_ix * 3),
                        3 + (grid_iy * 3),
+                       2, 2, 0, 1);
+      }
+    }
+  }
+
+  // Draw the current brick.
+  for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
+      if ((cur_block_y+grid_iy >= 0) &&
+          (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4)))) {
+        oled_draw_rect(48 + ((cur_block_x+grid_ix) * 3),
+                       3 + ((cur_block_y+grid_iy) * 3),
                        2, 2, 0, 1);
       }
     }
@@ -629,15 +641,44 @@ void draw_tetris_game(void) {
  * or setting it in place and clearing rows/creating the next one.
  */
 void tetris_game_tick(void) {
-  unsigned char can_drop = 0;
+  uint8_t grid_ix = 0;
+  uint8_t grid_iy = 0;
+  unsigned char can_drop = 1;
   /* Step 1:  Try to drop the current brick by 1 cell. */
+  for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
+      if ((cur_block_y+grid_iy >= 0) &&
+          (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) &&
+          ((cur_block_y+grid_iy > 18) ||
+           (tetris_grid[cur_block_x+grid_ix][cur_block_y+1+grid_iy] != TGRID_EMPTY))) {
+        can_drop = 0;
+      }
+    }
+  }
+
   if (can_drop) {
     /* Step 2a: If the current brick can drop, do so. */
-    /* Step 3a: Update the main Tetris grid. */
+    cur_block_y++;
   }
   else {
     /* Step 2b: If the current brick cannot drop, fix it
      *          in the main Tetris grid. */
-    /* Step 3b: Create a new 'current brick'. */
+    for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
+      for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
+        if (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) {
+          if (cur_block_y+grid_iy < 0) {
+            // (Game over - TODO)
+          }
+          else {
+            tetris_grid[cur_block_x+grid_ix][cur_block_y+grid_iy] = cur_block_type;
+          }
+        }
+      }
+    }
+    /* Step 3b: Clear any appropriate rows. */
+    /* Step 4b: Create a new 'current brick'. */
+    cur_block_x = 4;
+    cur_block_y = -1;
+    cur_block_r = 0;
   }
 }

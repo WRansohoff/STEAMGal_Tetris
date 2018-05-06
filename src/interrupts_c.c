@@ -242,5 +242,6 @@ void TIM2_IRQ_handler(void) {
   if (TIM2->SR & TIM_SR_UIF) {
     TIM2->SR &= ~(TIM_SR_UIF);
     uled_state = !uled_state;
+    tetris_game_tick();
   }
 }

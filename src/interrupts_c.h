@@ -4,6 +4,7 @@
 #include "global.h"
 
 #include "peripherals.h"
+#include "util_c.h"
 
 // C-language hardware interrupt method signatures.
 // Different chips have different NVIC definitions,

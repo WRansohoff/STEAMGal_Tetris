@@ -26,10 +26,10 @@ extern void pulse_out_pin(volatile void* gpiox_odr,
 // ----------------------
 // Global variables and defines.
 volatile unsigned char uled_state;
-#define GAME_STATE_MAIN_MENU (0)
-#define GAME_STATE_IN_GAME   (1)
-#define GAME_STATE_PAUSED    (2)
-#define GAME_STATE_GAME_OVER (3)
+#define GAME_STATE_MAIN_MENU  (0)
+#define GAME_STATE_IN_GAME    (1)
+#define GAME_STATE_PAUSED     (2)
+#define GAME_STATE_GAME_OVER  (3)
 volatile uint8_t game_state;
 #define MAIN_MENU_STATE_START (0)
 volatile uint8_t main_menu_state;
@@ -76,8 +76,9 @@ static const uint16_t BRICKS[4][7] = {
 volatile unsigned char tetris_grid[10][20];
 // Store information about the current block.
 volatile unsigned char cur_block_type;
-volatile uint8_t cur_block_x;
-volatile uint8_t cur_block_y;
+volatile int8_t cur_block_x;
+volatile int8_t cur_block_y;
+volatile uint8_t cur_block_r;
 
 // Buffer for the OLED screen.
 // Currently only supports 128x64-px monochrome.
