@@ -20,6 +20,12 @@ inline void EXTI1_line_interrupt(void) {
 
 inline void EXTI2_line_interrupt(void) {
   // 'Left' button.
+  if (game_state == GAME_STATE_IN_GAME) {
+    // Move the brick left, if possible.
+    if (!check_brick_pos(cur_block_x-1, cur_block_y)) {
+      cur_block_x -= 1;
+    }
+  }
 }
 
 inline void EXTI3_line_interrupt(void) {
@@ -32,6 +38,12 @@ inline void EXTI4_line_interrupt(void) {
 
 inline void EXTI5_line_interrupt(void) {
   // 'Right' button.
+  if (game_state == GAME_STATE_IN_GAME) {
+    // Move the brick right, if possible.
+    if (!check_brick_pos(cur_block_x+1, cur_block_y)) {
+      cur_block_x += 1;
+    }
+  }
 }
 
 inline void EXTI6_line_interrupt(void) {
@@ -68,7 +80,9 @@ inline void EXTI7_line_interrupt(void) {
       // To test the timer, use a prescaler of 1024.
       // 48MHz/1024 ~= 46.875KHz.
       // Use 46,875 'ticks' at 46.875KHz to trigger ~every second.
-      start_timer(TIM2, 1024, 46875);
+      //start_timer(TIM2, 1024, 46875);
+      // Or go a bit faster, for debugging.
+      start_timer(TIM2, 1024, 10000);
     }
   }
   else if (game_state == GAME_STATE_IN_GAME) {

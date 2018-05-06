@@ -664,6 +664,28 @@ void reset_game_state(void) {
 }
 
 /*
+ * Check whether the current brick can move into a
+ * given grid coordinate.
+ * Return 1 if there is a collision, 0 if the space is free.
+ */
+uint8_t check_brick_pos(int8_t xp, int8_t yp) {
+  uint8_t grid_ix = 0;
+  uint8_t grid_iy = 0;
+  for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
+      if ((yp+grid_iy >= 0) &&
+          (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) &&
+          ((yp+grid_iy > 19) || (xp+grid_ix < 0) ||
+           (xp+grid_ix > 9) ||
+           (tetris_grid[xp+grid_ix][yp+grid_iy] != TGRID_EMPTY))) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+/*
  * Main 'tick' for the Tetris game loop.
  * This performs one 'step' in the game, either dropping a brick
  * or setting it in place and clearing rows/creating the next one.
@@ -673,15 +695,8 @@ void tetris_game_tick(void) {
   uint8_t grid_iy = 0;
   unsigned char can_drop = 1;
   /* Step 1:  Try to drop the current brick by 1 cell. */
-  for (grid_ix = 0; grid_ix < 4; ++grid_ix) {
-    for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
-      if ((cur_block_y+grid_iy >= 0) &&
-          (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) &&
-          ((cur_block_y+grid_iy > 18) ||
-           (tetris_grid[cur_block_x+grid_ix][cur_block_y+1+grid_iy] != TGRID_EMPTY))) {
-        can_drop = 0;
-      }
-    }
+  if (check_brick_pos(cur_block_x, cur_block_y+1)) {
+    can_drop = 0;
   }
 
   if (can_drop) {
