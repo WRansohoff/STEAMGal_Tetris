@@ -209,7 +209,7 @@ int main(void) {
       // (TODO)
     }
     else if (game_state == GAME_STATE_GAME_OVER) {
-      // (TODO)
+      draw_game_over();
     }
     else {
       oled_draw_rect(0, 0, 128, 64, 0, 1);

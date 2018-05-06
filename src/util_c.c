@@ -593,6 +593,16 @@ void draw_main_menu(void) {
   oled_write_pixel(42, 44, 1);
 }
 
+void draw_game_over(void) {
+  oled_draw_rect(0, 0, 128, 64, 0, 0);
+  // Only use the middle 96 pixels, to make this easier
+  // to transition to a color display.
+  oled_draw_rect(15, 0, 96, 64, 2, 1);
+  // Draw a bit 'GAME OVER' label.
+  oled_draw_text(39, 12, "GAME\0", 1, 'L');
+  oled_draw_text(39, 36, "OVER\0", 1, 'L');
+}
+
 void draw_tetris_game(void) {
   oled_draw_rect(0, 0, 128, 64, 0, 0);
   // Only use the middle 96 pixels, to make this easier
@@ -636,6 +646,24 @@ void draw_tetris_game(void) {
 }
 
 /*
+ * 'Reset Game State' method, to start a new game.
+ */
+void reset_game_state(void) {
+  // Reset the 'current block' position.
+  cur_block_x = 4;
+  cur_block_y = -1;
+  cur_block_r = 0;
+  // Clear the grid memory.
+  uint8_t grid_ix = 0;
+  uint8_t grid_iy = 0;
+  for (grid_ix = 0; grid_ix < 10; ++grid_ix) {
+    for (grid_iy = 0; grid_iy < 20; ++grid_iy) {
+      tetris_grid[grid_ix][grid_iy] = TGRID_EMPTY;
+    }
+  }
+}
+
+/*
  * Main 'tick' for the Tetris game loop.
  * This performs one 'step' in the game, either dropping a brick
  * or setting it in place and clearing rows/creating the next one.
@@ -667,7 +695,10 @@ void tetris_game_tick(void) {
       for (grid_iy = 0; grid_iy < 4; ++grid_iy) {
         if (BRICKS[cur_block_r][cur_block_type] & (1 << (3-grid_ix+(3-grid_iy)*4))) {
           if (cur_block_y+grid_iy < 0) {
-            // (Game over - TODO)
+            // Game over
+            game_state = GAME_STATE_GAME_OVER;
+            uled_state = 0;
+            stop_timer(TIM2);
           }
           else {
             tetris_grid[cur_block_x+grid_ix][cur_block_y+grid_iy] = cur_block_type;

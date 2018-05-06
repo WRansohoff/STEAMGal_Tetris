@@ -48,6 +48,13 @@ inline void EXTI6_line_interrupt(void) {
   else if (game_state == GAME_STATE_PAUSED) {
   }
   else if (game_state == GAME_STATE_GAME_OVER) {
+    // Either the 'A' or 'B' button returns to the
+    // main menu from a 'Game Over' screen.
+    game_state = GAME_STATE_MAIN_MENU;
+    main_menu_state = MAIN_MENU_STATE_START;
+    uled_state = 0;
+    stop_timer(TIM2);
+    reset_game_state();
   }
 }
 
@@ -69,6 +76,13 @@ inline void EXTI7_line_interrupt(void) {
   else if (game_state == GAME_STATE_PAUSED) {
   }
   else if (game_state == GAME_STATE_GAME_OVER) {
+    // Either the 'A' or 'B' button returns to the
+    // main menu from a 'Game Over' screen.
+    game_state = GAME_STATE_MAIN_MENU;
+    main_menu_state = MAIN_MENU_STATE_START;
+    uled_state = 0;
+    stop_timer(TIM2);
+    reset_game_state();
   }
 }
 
@@ -242,6 +256,8 @@ void TIM2_IRQ_handler(void) {
   if (TIM2->SR & TIM_SR_UIF) {
     TIM2->SR &= ~(TIM_SR_UIF);
     uled_state = !uled_state;
-    tetris_game_tick();
+    if (game_state == GAME_STATE_IN_GAME) {
+      tetris_game_tick();
+    }
   }
 }
